@@ -1,0 +1,31 @@
+name: R tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Install dependencies
+        run: Rscript R/00_install_packages.R
+
+      - name: Run tests
+        run: Rscript tests/run_tests.R
+
+      - name: Run peak-detection pipeline on demo data
+        run: |
+          Rscript R/01_load_ww_data.R
+          Rscript R/02_load_cases_data.R
+          Rscript R/03_run_peak_detection.R
+          Rscript R/05_make_qc_plots.R
+
+  # The Stan exponential-growth step (R/04_run_stan_exponential_growth.R) is
+  # intentionally not run in CI: it requires rstan/cmdstanr and a C++
+  # toolchain, which makes CI slow and brittle. Run it manually -- see that
+  # file's header comment for setup instructions.

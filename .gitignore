@@ -1,0 +1,8 @@
+.Rhistory
+.RData
+.Rproj.user
+data/processed/
+results/
+figures/
+*.log
+.DS_Store
