@@ -3,8 +3,8 @@ data {
   int<lower=1> N_estimated; // Number of data points the model is fit on.
   int<lower=1> window; // Time window in days for fitting exponential growth.
   vector[N] T; // Time points in days, starting at 1.
-  real Y[N]; // Outcomes at each time point.
-  int<lower=0> Y_int[N]; // Integer version of Y
+  array[N] real Y; // Outcomes at each time point.
+  array[N] int<lower=0> Y_int; // Integer version of Y
   int<lower=0, upper=3> family; // 1 = Normal (constant variance), 2 = Poisson, 3 = Negative Binomial.
   int<lower=0,upper=1> constant_family_param; // 1 = keep family parameter constant. 0 = independently estimate.
   real theta_prior_shape; // Prior value for theta shape.
@@ -18,7 +18,7 @@ data {
   int<lower=0,upper=1> debug; // Whether to print out values for the sake of debugging.
 }
 transformed data {
-  int start_idx[N]; // Precompute the start index for each window
+  array[N] int start_idx; // Precompute the start index for each window
   int not_est; // Number of not estimated points.
   int integer_outcome; // 0 = real, continuous outcome. 1 = integer outcome.
   row_vector[window + 1] predict_window; // window to estimate on.
@@ -39,15 +39,15 @@ transformed data {
     integer_outcome = 1;
   }
 }
-parameters{ 
-  real<lower=0> theta[constant_family_param ? 1 : N_estimated]; // Negative binomial dispersion.
-  real<lower=0> sigma[constant_family_param ? 1 : N_estimated]; // Standard deviation of normal.
-  real<lower=0> beta[N_estimated]; // The intercept at each time window.
+parameters{
+  array[constant_family_param ? 1 : N_estimated] real<lower=0> theta; // Negative binomial dispersion.
+  array[constant_family_param ? 1 : N_estimated] real<lower=0> sigma; // Standard deviation of normal.
+  array[N_estimated] real<lower=0> beta; // The intercept at each time window.
   vector[N_estimated] eta; // The growth rate at each time window.
 }
 transformed parameters{
-  real<lower=0> theta_vec[N_estimated]; // theta_vec used.
-  real<lower=0> sigma_vec[N_estimated]; // sigma_vec used.
+  array[N_estimated] real<lower=0> theta_vec; // theta_vec used.
+  array[N_estimated] real<lower=0> sigma_vec; // sigma_vec used.
   
   // make theta vec
   if(constant_family_param){
@@ -99,13 +99,13 @@ model{
 	  vector[count] mu_t = beta[t]*exp(eta[t]*T_window) + 1; // Get the mean
 	  
 	  if(family == 1){ // normal
-	    real Y_window[count] = Y[start:n];
-	    Y_window ~ normal(mu_t, sigma_vec[t]); 
+	    array[count] real Y_window = Y[start:n];
+	    Y_window ~ normal(mu_t, sigma_vec[t]);
 	  }else if(family == 2){ // poisson
-	    int Y_window[count] = Y_int[start:n];
+	    array[count] int Y_window = Y_int[start:n];
 	    Y_window ~ poisson(mu_t); // the intended model.
 	  }else if(family == 3){ // negative binomial
-	    int Y_window[count] = Y_int[start:n];
+	    array[count] int Y_window = Y_int[start:n];
 	    Y_window ~ neg_binomial_2(mu_t, theta_vec[t]); // the intended model.
 		if(debug == 1){
 		  print("theta = ", theta); 
@@ -117,7 +117,7 @@ model{
 generated quantities{
   matrix[N_estimated, window + 1] estimates; // matrix of estimates. Rows are the starting points for estimation. Columns are the predictions at each time point for that fit.
   matrix[N_estimated*(1-integer_outcome), (window + 1)*(1-integer_outcome)] predictions; // matrix of predictions for real, continous outcomes. Dimensions are [0,0] if using integer outcomes.
-  int predictions_int[N_estimated*integer_outcome, (window + 1)*integer_outcome]; // matrix of predictions for integer outcomes.
+  array[N_estimated*integer_outcome, (window + 1)*integer_outcome] int predictions_int; // matrix of predictions for integer outcomes.
   for (t in 1:N_estimated){
     estimates[t] = beta[t]*exp(eta[t]*predict_window);
 	if(family == 1){

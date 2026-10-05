@@ -68,6 +68,15 @@ The Stan step additionally requires `rstan` (`install.packages("rstan")`) or
 toolchain. If neither is installed, the main pipeline script below skips that
 step automatically and still runs everything else.
 
+**Note on sample size:** the Stan step here uses `nsample = 1000` per fit,
+while the paper's own analysis used `nsample = 10000`. This keeps the demo's
+runtime reasonable (20 fits across 10 counties x 2 series), but means
+posterior diagnostics (R-hat, effective sample size) are weaker than in the
+paper -- treat results as illustrative of the method, not publication-quality
+inference. Increase `NSAMPLE`/`BURNIN` in `R/04_run_stan_exponential_growth.R`
+for more reliable estimates (at the cost of runtime). The script prints a
+reminder of this every time it runs.
+
 ## Running the pipeline
 
 ```r

@@ -6,3 +6,4 @@ results/
 figures/
 *.log
 .DS_Store
+stan/*.rds
