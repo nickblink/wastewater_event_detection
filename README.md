@@ -18,7 +18,11 @@ on a demo subset of **10 US counties**, restricted to **2020–March 2023**
 (JHU's active reporting window). Results produced by this repo are
 illustrative of the *method* and will not match the paper's results, which
 were computed on different (proprietary, more granular) data and a larger set
-of locations. See the paper [citation needed] for the actual results.
+of locations. See the paper for the actual results:
+
+> Link NB, et al. Modeling and Evaluating Wastewater-Based COVID-19 Event
+> Detection and its Environmental Drivers. medRxiv. 2026.
+> https://www.medrxiv.org/content/10.64898/2026.05.14.26353186v1
 
 ## What's here
 
@@ -115,8 +119,8 @@ driver of peak selection, so this is expected.
 
 ## Citation
 
-If you use this code, please cite: [paper citation to be added].
+If you use this code, please cite:
 
-## License
-
-MIT, see `LICENSE`.
+> Link NB, et al. Modeling and Evaluating Wastewater-Based COVID-19 Event
+> Detection and its Environmental Drivers. medRxiv. 2026.
+> https://www.medrxiv.org/content/10.64898/2026.05.14.26353186v1
